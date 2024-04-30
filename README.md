@@ -1,6 +1,6 @@
 # zk-agreement
 
-[TOC]
+## Table of Contents
 
 ## Description
 
