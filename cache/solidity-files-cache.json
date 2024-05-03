@@ -1,0 +1,113 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/MiMC5Sponge.sol": {
+      "lastModificationDate": 1714672865053,
+      "contentHash": "019ce0b2ba2353e883c01b5ff8b18a91",
+      "sourceName": "contracts/MiMC5Sponge.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.17"
+      ],
+      "artifacts": [
+        "Hasher"
+      ]
+    },
+    "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/ReentrancyGuard.sol": {
+      "lastModificationDate": 1714672868698,
+      "contentHash": "03f3f9a69c896ffd2d7cc297cc8c7d53",
+      "sourceName": "contracts/ReentrancyGuard.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.17"
+      ],
+      "artifacts": [
+        "ReentrancyGuard"
+      ]
+    },
+    "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/zkAgreement.sol": {
+      "lastModificationDate": 1714674677466,
+      "contentHash": "3c67def08d200e042c7565d8c9db8dba",
+      "sourceName": "contracts/zkAgreement.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./MiMC5Sponge.sol",
+        "./ReentrancyGuard.sol"
+      ],
+      "versionPragmas": [
+        "0.8.17"
+      ],
+      "artifacts": [
+        "zkAgreement"
+      ]
+    }
+  }
+}
