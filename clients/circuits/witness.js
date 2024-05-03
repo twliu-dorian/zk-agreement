@@ -1,22 +1,28 @@
 require('dotenv').config();
+const hre = require("hardhat");
 const wc = require("../../agreement_js/witness_calculator.js")
-const { ethers } = require("ethers")
-
+const { ethers, JsonRpcProvider } = require("ethers")
 const { prng } = require("../utils/prng.js")
 const fs = require('fs').promises;
 const path = require('path');
-
 const wasmPath = "agreement_js/agreement.wasm";
 
+const privateKey = process.env.PRIVATE_KEY;
+const urlKey = process.env.API_URL_KEY;
+
+const signerWallet = new ethers.Wallet(privateKey);
+const provider = new JsonRpcProvider(urlKey);
+const signer = signerWallet.connect(provider)
+
+
+provider.getBlockNumber().then((result) => {
+    console.log("Current block number: " + result);
+});
 const senderAddress = process.env.SENDER_ADDRESS;
 const agreementAddress = process.env.AGREEMENT_ADDRESS;
 const agreementJSON = require("../../artifacts/contracts/zkAgreement.sol/zkAgreement.json")
 const agreementABI = agreementJSON.abi;
-const agreeementInterface = new ethers.Interface(agreementABI)
-const privateKey = process.env.PRIVATE_KEY;
-const urlKey = process.env.API_URL_KEY
-const signer = new ethers.Wallet(privateKey)
-const provider = new ethers.JsonRpcProvider(urlKey)
+const agreementInterface = new ethers.Interface(agreementABI)
 
 const calculateWitness = async () => {
 
@@ -35,42 +41,44 @@ const calculateWitness = async () => {
     const commitment = witnessResult[1];
     const nullifierHash = witnessResult[2];
 
-    console.log(commitment)
-    console.log(nullifierHash)
+    console.log("commitment    :", commitment)
+    console.log("nullifier hash:", nullifierHash)
 
-    const value = BigInt("1000000000000000000").toString();
-    const tx = {
+    const value = BigInt("1000000000").toString();
+    const unsignedTx = {
         to: agreementAddress,
         from: senderAddress,
         value: value,
-        data: agreeementInterface.encodeFunctionData("agreement", [commitment])
+        data: agreementInterface.encodeFunctionData("agreement", [commitment])
     };
 
     try {
-        const signedTx = await signer.signTransaction(tx);
+        const tx = await signer.sendTransaction(unsignedTx);
+        await tx.wait();
 
-        const receipt = await provider.send(signedTx);
-        const log = receipt.logs[0];
+        const txReceipt = await provider.getTransactionReceipt(tx.hash);
+        console.log('Transaction Receipt:', txReceipt);
 
-        const decodedData = agreeementInterface.decodeEventLog("Agreement", log.Data, log.topics);
-        // const proofElements = {
-        //     nullifierHash: `${nullifierHash}`,
-        //     secret: secret,
-        //     nullifier: nullifier,
-        //     commitment: `${commitment}`,
-        //     txHash: txHash
-        // };
+        const log = txReceipt.logs[0];
 
-        console.log(decodedData);
+        const decodedData = agreementInterface.decodeEventLog("Agreement", log.data, log.topics);
+        const proofElements = {
+            merkleRoot: BigInt(decodedData.root),
+            nullifierHash: nullifierHash,
+            secret: input.secret,
+            nullifier: input.nullifier,
+            commitment: commitment,
+            hashPairings: decodedData.hashPairings.map((n) => BigInt(n)),
+            hashDirections: decodedData.pairDirection,
+            txHash: tx.hash,
+        };
 
-        updateProofElements(btoa(JSON.stringify(proofElements)));
+        console.log(proofElements);
+
     } catch (e) {
         console.log(e);
     }
 
-
-    console.log(nullifierHash)
-    console.log(commitment)
 }
 
 

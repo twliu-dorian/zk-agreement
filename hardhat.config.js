@@ -1,7 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 
 const dotenv = require("dotenv");
-const { network } = require("hardhat");
 dotenv.config();
 const privateKey = process.env.PRIVATE_KEY;
 const urlKey = process.env.API_URL_KEY
@@ -16,14 +15,14 @@ const config = {
     ]
   },
   networks: {
-    localhost: {
-      url: "http://127.0.0.1:8545/",
-      chainId: 31337,
-      accounts
-    },
     sepolia: {
       url: urlKey,
       accounts: [privateKey],
+      chainId: 11155111,
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545/",
+      chainId: 31337,
     },
   }
 
