@@ -1,5 +1,8 @@
 pragma circom  2.0.0;
 
+include "./utils/mimc5sponge.circom";
+include "./agreement.circom";
+
 /**
 private input
     result
@@ -26,7 +29,7 @@ template Evaluator(){
 
     // check if the public variable (submitted) nullifierHash is equal to the output 
     // from hashing secret and nullifier
-    component agreement = Agreement();
+    component agreement = CommitmentGenerator();
     agreement.secret <== secret;
     agreement.nullifier <== nullifier;
     agreement.nullifierHash === nullifierHash;
@@ -52,11 +55,16 @@ template Evaluator(){
         right[i] <== d * currentHash[i];
         leafHashers[i].ins[1] <== right[i] + (1 - d) * hashPairings[i];
 
-        leafHashers[i].k <== cHasher.commitment;
+        leafHashers[i].k <== agreement.commitment;
         currentHash[i + 1] <== leafHashers[i].o;
     }
 
     root === currentHash[10];
+
+    // 
+    signal recipientConstraint <==  recipient * recipient;
+    signal senderConstraint <== sender * sender;
+    signal resultConstraint <== result * result;
 }
 
 component main {public [root, nullifierHash, recipient]} = Evaluator();

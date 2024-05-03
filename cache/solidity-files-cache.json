@@ -108,6 +108,41 @@
       "artifacts": [
         "zkAgreement"
       ]
+    },
+    "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/Evaluator.sol": {
+      "lastModificationDate": 1714772496063,
+      "contentHash": "5b324b7d5a1821286b5ac85f4b404fdf",
+      "sourceName": "contracts/Evaluator.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.7.0 <0.9.0"
+      ],
+      "artifacts": [
+        "Groth16Verifier"
+      ]
     }
   }
 }

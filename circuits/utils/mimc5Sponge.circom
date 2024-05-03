@@ -81,4 +81,4 @@ template MiMC5Sponge(nInputs) {
 
     o <== lastR[nInputs];
 }
-component main = MiMC5Sponge(2);
+// component main = MiMC5Sponge(2);

@@ -1,13 +1,18 @@
-const { ethers } = require("ethers");
+const crypto = require('crypto');
 
 const num = 20;
-
+const length = 256;
 async function generate() {
     for (let i = 0; i < num; i++) {
         // Generate random bytes and create a BigNumber from them
 
-        let n = ethers.BigNumber.from(ethers.utils.randomBytes(32));
-        console.log(n.toString());
+        const bytes = crypto.randomBytes(length / 8);
+        const bitString = bytes.reduce((acc, byte) => {
+            const bits = byte.toString(2).padStart(8, '0');
+            return acc + bits;
+        }, '');
+
+        console.log(BigInt(`0b${bitString}`).toString());
     }
 }
 
