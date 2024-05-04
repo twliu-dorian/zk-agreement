@@ -4,17 +4,22 @@ async function main() {
     // deploy hasher
     const Hasher = await hre.ethers.getContractFactory("Hasher");
     const hasher = await Hasher.deploy();
-
     await hasher.waitForDeployment();
-    console.log(hasher.address);
-
     const hasherAddress = hasher.getAddress();
+    console.log("hasher address:", hasherAddress);
 
-    // deploy tornado
+    // deploy verifier
+    const Verifier = await hre.ethers.getContractFactory("Groth16Verifier")
+    const verifier = await Verifier.deploy();
+    await verifier.waitForDeployment();
+    const verifierAddress = hasher.getAddress();
+    console.log("verifier address:", verifierAddress);
+
+    // deploy agreement
     const ZkAgreement = await hre.ethers.getContractFactory("zkAgreement");
-    const zkAgreement = await ZkAgreement.deploy(hasherAddress, "0x27DE3fd75B0540DB22E41038ac692116e0dfea0B");
+    const zkAgreement = await ZkAgreement.deploy(hasherAddress, verifierAddress);
     await zkAgreement.waitForDeployment();
-    console.log(zkAgreement.getAddress());
+    console.log("agreement address:", zkAgreement.getAddress());
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.

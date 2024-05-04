@@ -67,4 +67,4 @@ template Evaluator(){
     signal resultConstraint <== result * result;
 }
 
-component main {public [root, nullifierHash, recipient]} = Evaluator();
+component main {public [root, nullifierHash, recipient, sender, result]} = Evaluator();

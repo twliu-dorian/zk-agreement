@@ -4,8 +4,18 @@ pragma solidity 0.8.17;
 import "./MiMC5Sponge.sol";
 import "./ReentrancyGuard.sol";
 
+interface IEvaluator {
+    function verifyProof(
+        uint[2] calldata _pA,
+        uint[2][2] calldata _pB,
+        uint[2] calldata _pC,
+        uint[5] calldata _pubSignals
+    ) external;
+}
+
 contract zkAgreement is ReentrancyGuard {
     Hasher hasher;
+    address evaluator;
     uint public treeLevel = 10;
     uint256 public denomination = 1 ether;
     uint public nextLeafIdx = 0;
@@ -33,9 +43,17 @@ contract zkAgreement is ReentrancyGuard {
         uint256[10] hashPairings,
         uint8[10] pairDirection
     );
-    constructor(address _hasher, address _verifier) {
+    event Evaluate(
+        address evaluator,
+        uint256 nullifierHash,
+        address recipient,
+        address sender,
+        uint256 result
+    );
+
+    constructor(address _hasher, address _evaluator) {
         hasher = Hasher(_hasher);
-        // verifier = _verifier;
+        evaluator = _evaluator;
     }
 
     function agreement(uint256 _commitment) external payable nonReentrant {
@@ -80,5 +98,55 @@ contract zkAgreement is ReentrancyGuard {
 
         commitments[_commitment] = true;
         emit Agreement(newRoot, hashPairings, hashDirections);
+    }
+    function evaluate(
+        uint[2] calldata _pA,
+        uint[2][2] calldata _pB,
+        uint[2] calldata _pC,
+        uint[5] calldata _pubSignals // check how many inputs do we actually need
+    ) external payable nonReentrant {
+        uint _root = _pubSignals[0];
+        uint _nullifierHash = _pubSignals[1];
+        uint _recipient = _pubSignals[2];
+        uint _sender = _pubSignals[3];
+        uint _result = _pubSignals[4];
+
+        require(!nullifierHashes[_nullifierHash], "already-spent");
+        require(roots[_root], "non-root");
+
+        (bool verifyOK, ) = evaluator.call(
+            abi.encodeCall(
+                IEvaluator.verifyProof,
+                (
+                    _pA,
+                    _pB,
+                    _pC,
+                    [_root, _nullifierHash, _recipient, _sender, _result]
+                )
+            )
+        );
+
+        require(verifyOK, "invalid zero knowledge proof");
+
+        nullifierHashes[_nullifierHash] = true;
+        address payable target = payable(msg.sender);
+
+        (bool ok, ) = target.call{value: denomination}("");
+        require(ok, "payment-failed");
+
+        address recipientAddr = uintToAddress(_recipient);
+        address senderAddr = uintToAddress(_sender);
+
+        emit Evaluate(
+            msg.sender,
+            _nullifierHash,
+            recipientAddr,
+            senderAddr,
+            _result
+        );
+    }
+
+    function uintToAddress(uint256 value) public pure returns (address) {
+        return address(uint160(value));
     }
 }
