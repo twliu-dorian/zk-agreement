@@ -6,6 +6,7 @@ async function main() {
     // const hasher = await Hasher.deploy();
     // await hasher.waitForDeployment();
     // const hasherAddress = hasher.getAddress();
+    // hasher.addr
     // console.log("hasher address:", hasherAddress);
 
     // // deploy verifier
@@ -16,9 +17,9 @@ async function main() {
     // const verifierAddress = hasher.getAddress();
     // console.log("verifier address:", verifierAddress);
 
-    // deploy agreement
+    // deploy agreement, first address is the Hasher, second is the Groth16Verifier
     const ZkAgreement = await hre.ethers.getContractFactory("zkAgreement");
-    const zkAgreement = await ZkAgreement.deploy("0x4c5859f0f772848b2d91f1d83e2fe57935348029", "0x1291be112d480055dafd8a610b7d1e203891c274");
+    const zkAgreement = await ZkAgreement.deploy("0x7bc06c482dead17c0e297afbc32f6e63d3846650", "0xc351628eb244ec633d5f21fbd6621e1a683b1181");
     await zkAgreement.waitForDeployment();
     console.log("agreement address:", zkAgreement.getAddress());
 }

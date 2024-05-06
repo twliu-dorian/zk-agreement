@@ -18,28 +18,30 @@ public input
 template Evaluator(){
     signal input root;
     signal input nullifierHash;
+    signal input commitment;
     signal input sender; // user A
     signal input recipient; // user B
     signal input result; // result from mpc circuit
 
-    signal input secret[256];
-    signal input nullifier[256];
+    // signal input secret[256];
+    signal input evaluator[256];
+    // signal input nullifier[256];
     signal input hashPairings[10];
     signal input hashDirections[10];
 
     // check if the public variable (submitted) nullifierHash is equal to the output 
-    // from hashing secret and nullifier
-    component agreement = CommitmentGenerator();
-    agreement.secret <== secret;
-    agreement.nullifier <== nullifier;
-    agreement.nullifierHash === nullifierHash;
+    // component agreement = CommitmentGenerator();
+    // agreement.secret <== secret;
+    // agreement.nullifier <== nullifier;
+    // agreement.nullifierHash === nullifierHash;
 
 
     // checking merkle tree hash path
     component leafHashers[10];
 
     signal currentHash[10 + 1];
-    currentHash[0] <== agreement.commitment;
+    // currentHash[0] <== agreement.commitment;
+    currentHash[0] <== commitment;
 
     signal left[10];
     signal right[10];
@@ -55,16 +57,22 @@ template Evaluator(){
         right[i] <== d * currentHash[i];
         leafHashers[i].ins[1] <== right[i] + (1 - d) * hashPairings[i];
 
-        leafHashers[i].k <== agreement.commitment;
+        // leafHashers[i].k <== agreement.commitment;
+        leafHashers[i].k <== commitment;
         currentHash[i + 1] <== leafHashers[i].o;
     }
 
     root === currentHash[10];
 
-    // 
+    // constraining signals
     signal recipientConstraint <==  recipient * recipient;
     signal senderConstraint <== sender * sender;
     signal resultConstraint <== result * result;
+    
+    signal evaluatorConstraint[256];
+    for (var i = 0; i < 256; i++) {
+        evaluatorConstraint[i] <== evaluator[i] * evaluator[i];
+    }
 }
 
 component main {public [root, nullifierHash, recipient, sender, result]} = Evaluator();

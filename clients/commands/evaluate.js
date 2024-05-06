@@ -14,7 +14,7 @@ const zkagreementJSON = require("../../artifacts/contracts/zkAgreement.sol/zkAgr
 const zkAgreementABI = zkagreementJSON.abi;
 const zkAgreementInterface = new ethers.Interface(zkAgreementABI)
 
-const evaluateAgreement = async (proofPath, result) => {
+const evaluateAgreement = async (proofPath, evaluator, result) => {
 
     try {
         const proofString = fs.readFileSync(proofPath, 'utf8');
@@ -26,11 +26,14 @@ const evaluateAgreement = async (proofPath, result) => {
         const proofInput = {
             "root": proofElements.merkleRoot,
             "nullifierHash": proofElements.nullifierHash,
-            "recipient": utils.hexToDecimal(recipientAddress),
+            "commitment": proofElements.commitment,
             "sender": utils.hexToDecimal(senderAddress),
+            "recipient": utils.hexToDecimal(recipientAddress),
+
             "result": resultString,
-            "secret": utils.decToBinaryArray(proofElements.secret),
-            "nullifier": utils.decToBinaryArray(proofElements.nullifier),
+            // "secret": utils.decToBinaryArray(proofElements.secret),
+            "evaluator": evaluator,
+            // "nullifier": utils.decToBinaryArray(proofElements.nullifier),
             "hashPairings": proofElements.hashPairings,
             "hashDirections": utils.convertToBinaryArray(proofElements.hashDirections)
         }
@@ -67,9 +70,13 @@ const evaluateAgreement = async (proofPath, result) => {
         await tx.wait();
         const txReceipt = await provider.getTransactionReceipt(tx.hash);
         console.log('Transaction Receipt:', txReceipt);
+        await provider.destroy();
 
     } catch (e) {
         console.log(e);
+    } finally {
+        provider.removeAllListeners();
+        process.exit(0);
     }
 
 }

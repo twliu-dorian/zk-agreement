@@ -1,8 +1,8 @@
 node_modules
 .env
 .DS_Store
-cicruit/agreement_js
-circuit/evaluator_js
+agreement_js
+evaluator_js
 notes
 ceremony*
 setup*
@@ -10,4 +10,5 @@ proof.txt
 evaluator.r1cs
 proof.json
 public.json
-verfication_key.json
+verification_key.json
+circuit.sh
