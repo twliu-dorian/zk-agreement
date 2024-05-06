@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-const { generateAgreementWitness } = require("./clients/commands/agreement.js")
+const { generateAgreementWitness } = require("./clients/commands/agreement.js");
+const { evaluateAgreement } = require("./clients/commands/evaluate.js");
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
@@ -15,8 +16,21 @@ const argv = yargs(hideBin(process.argv))
             .positional('b', {
                 describe: 'User B',
                 type: 'string'
+            });
+    }, (argv) => generateAgreementWitness(argv.a, argv.b))
+    .command('evaluate [in] [result]', 'Evaluate the agreed commitment', (yargs) => {
+        return yargs
+            .positional('in', {
+                describe: 'the commitment of the agreed statement',
+                type: 'string',
+                default: 'proof.txt'
             })
-    }, generateAgreementWitness)
+            .positional('result', {
+                describe: 'the commitment of the agreed statement',
+                type: 'number',
+                default: 1
+            });
+    }, (argv) => evaluateAgreement(argv.in, argv.result))
     .help()
     .alias('help', 'h')
     .argv;

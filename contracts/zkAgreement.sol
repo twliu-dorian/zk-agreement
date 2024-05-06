@@ -17,7 +17,7 @@ contract zkAgreement is ReentrancyGuard {
     Hasher hasher;
     address evaluator;
     uint public treeLevel = 10;
-    uint256 public denomination = 1 ether;
+    uint256 public denomination = 0.001 ether;
     uint public nextLeafIdx = 0;
 
     mapping(uint256 => bool) public roots;
@@ -103,7 +103,7 @@ contract zkAgreement is ReentrancyGuard {
         uint[2] calldata _pA,
         uint[2][2] calldata _pB,
         uint[2] calldata _pC,
-        uint[5] calldata _pubSignals // check how many inputs do we actually need
+        uint[5] calldata _pubSignals
     ) external payable nonReentrant {
         uint _root = _pubSignals[0];
         uint _nullifierHash = _pubSignals[1];
@@ -129,13 +129,22 @@ contract zkAgreement is ReentrancyGuard {
         require(verifyOK, "invalid zero knowledge proof");
 
         nullifierHashes[_nullifierHash] = true;
-        address payable target = payable(msg.sender);
 
-        (bool ok, ) = target.call{value: denomination}("");
-        require(ok, "payment-failed");
+        // (bool ok, ) = target.call{value: denomination}("");
+        // require(ok, "payment-failed");
 
         address recipientAddr = uintToAddress(_recipient);
         address senderAddr = uintToAddress(_sender);
+
+        if (_result == 1) {
+            (bool success, ) = recipientAddr.call{value: denomination}("");
+            require(success, "Failed to send Ether to recipient");
+        } else if (_result == 0) {
+            (bool success, ) = senderAddr.call{value: denomination}("");
+            require(success, "Failed to send Ether to sender");
+        } else {
+            revert("Invalid result value");
+        }
 
         emit Evaluate(
             msg.sender,

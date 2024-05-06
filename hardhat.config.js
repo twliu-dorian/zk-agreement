@@ -18,17 +18,28 @@ const config = {
     ]
   },
   networks: {
-    sepolia: {
-      url: urlKey,
-      accounts: [privateKey],
-      chainId: 11155111,
-    },
     localhost: {
-      url: "http://127.0.0.1:8545/",
+      url: urlKey,
       chainId: 31337,
     },
   }
 
 };
+
+task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+  const accounts = await hre.ethers.getSigners();
+  const provider = hre.ethers.provider;
+
+  for (const account of accounts) {
+    console.log(
+      "%s (%i ETH)",
+      account.address,
+      hre.ethers.formatGwei(
+        // getBalance returns wei amount, format to ETH amount
+        await provider.getBalance(account.address)
+      )
+    );
+  }
+});
 
 module.exports = config;

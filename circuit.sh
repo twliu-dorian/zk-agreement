@@ -10,3 +10,8 @@ snarkjs groth16 setup evaluator.r1cs ceremony_final.ptua setup_0000.zkey
 snarkjs zkey contribute setup_0000.zkey setup_final.zkey
 snarkjs zkey verify evaluator.r1cs ceremony_final.ptua setup_final.zkey
 snarkjs zkey export solidityverifier setup_final.zkey contracts/Evaluator.sol
+
+snarkjs zkey export verificationkey setup_final.zkey verification_key.json
+snarkjs groth16 fullprove evaluator_js/input.json evaluator_js/evaluator.wasm setup_final.zkey proof.json public.json
+snarkjs zkey export solidityverifier setup_final.zkey contracts/Verifier.sol
+snarkjs zkey export soliditycalldata public.json proof.json
