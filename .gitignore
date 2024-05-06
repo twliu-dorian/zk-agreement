@@ -6,3 +6,8 @@ circuit/evaluator_js
 notes
 ceremony*
 setup*
+proof.txt
+evaluator.r1cs
+proof.json
+public.json
+verfication_key.json
