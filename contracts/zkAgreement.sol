@@ -24,6 +24,7 @@ contract zkAgreement is ReentrancyGuard {
     mapping(uint8 => uint256) lastLevelHash;
     mapping(uint => bool) public nullifierHashes;
     mapping(uint256 => bool) public commitments;
+    mapping(uint256 => uint256) public nullifierValue;
 
     uint256[10] levelDefaults = [
         63771806957809309726317474227089898627135440676260389143578078221402337729597,
