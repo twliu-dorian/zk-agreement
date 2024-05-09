@@ -20,7 +20,6 @@ const evaluateAgreement = async (proofPath, evaluator, result) => {
         const proofString = fs.readFileSync(proofPath, 'utf8');
 
         const proofElements = JSON.parse(atob(proofString));
-        console.log(proofElements)
         const resultString = '' + result
 
         const proofInput = {
@@ -29,18 +28,14 @@ const evaluateAgreement = async (proofPath, evaluator, result) => {
             "commitment": proofElements.commitment,
             "sender": utils.hexToDecimal(senderAddress),
             "recipient": utils.hexToDecimal(recipientAddress),
-
             "result": resultString,
-            // "secret": utils.decToBinaryArray(proofElements.secret),
-            "evaluator": evaluator,
-            // "nullifier": utils.decToBinaryArray(proofElements.nullifier),
+            "evaluator": evaluator.split(''),
             "hashPairings": proofElements.hashPairings,
             "hashDirections": utils.convertToBinaryArray(proofElements.hashDirections)
         }
         console.log(proofInput)
         const jsonData = JSON.stringify(proofInput, null, 2);
 
-        // Write the JSON string to a file named 'data.json'
         fs.writeFile('evaluator_js/input.json', jsonData, (err) => {
             if (err) {
                 console.error('An error occurred:', err);
@@ -51,7 +46,7 @@ const evaluateAgreement = async (proofPath, evaluator, result) => {
 
 
         const { proof, publicSignals } = await snarkJS.groth16.fullProve(proofInput, evaluatorWasmPath, zkeyPath)
-        console.log(proof)
+
         console.log(publicSignals)
         const callInputs = [
             proof.pi_a.slice(0, 2).map(utils.BN256ToHex),

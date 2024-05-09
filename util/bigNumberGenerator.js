@@ -11,7 +11,7 @@ async function generate() {
             const bits = byte.toString(2).padStart(8, '0');
             return acc + bits;
         }, '');
-
+        console.log(bitString)
         console.log(BigInt(`0b${bitString}`).toString());
     }
 }

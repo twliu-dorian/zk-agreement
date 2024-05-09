@@ -67,7 +67,7 @@ const utils = {
             const bits = byte.toString(2).padStart(8, '0');
             return acc + bits;
         }, '');
-        return bitString.split('');
+        return bitString;
     }
 };
 

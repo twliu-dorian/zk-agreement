@@ -17,14 +17,14 @@ contract zkAgreement is ReentrancyGuard {
     Hasher hasher;
     address evaluator;
     uint public treeLevel = 10;
-    uint256 public denomination = 0.001 ether;
+    uint256 public denomination = 0.1 ether;
     uint public nextLeafIdx = 0;
 
     mapping(uint256 => bool) public roots;
     mapping(uint8 => uint256) lastLevelHash;
     mapping(uint => bool) public nullifierHashes;
     mapping(uint256 => bool) public commitments;
-    mapping(uint256 => uint256) public nullifierValue;
+    mapping(uint256 => uint256) public commitmentValue;
 
     uint256[10] levelDefaults = [
         63771806957809309726317474227089898627135440676260389143578078221402337729597,
@@ -65,6 +65,7 @@ contract zkAgreement is ReentrancyGuard {
         uint8[10] memory hashDirections;
         uint256 currentIdx = nextLeafIdx;
         uint256 currentHash = _commitment;
+        commitmentValue[commitments] = msg.value;
 
         uint256 left;
         uint256 right;
@@ -100,6 +101,7 @@ contract zkAgreement is ReentrancyGuard {
         commitments[_commitment] = true;
         emit Agreement(newRoot, hashPairings, hashDirections);
     }
+
     function evaluate(
         uint[2] calldata _pA,
         uint[2][2] calldata _pB,
@@ -138,7 +140,7 @@ contract zkAgreement is ReentrancyGuard {
         address senderAddr = uintToAddress(_sender);
 
         if (_result == 1) {
-            (bool success, ) = recipientAddr.call{value: denomination}("");
+            (bool success, ) = recipientAddr.call{value: commitmentValue[]}("");
             require(success, "Failed to send Ether to recipient");
         } else if (_result == 0) {
             (bool success, ) = senderAddr.call{value: denomination}("");

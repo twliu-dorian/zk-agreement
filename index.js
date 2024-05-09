@@ -8,17 +8,26 @@ const { utils } = require("./clients/utils/util.js");
 const argv = yargs(hideBin(process.argv))
     .scriptName("zk-agreement")
     .usage('$0 <cmd> [args]')
-    .command('agree <a> <b>', 'Calculate the agreement witness', (yargs) => {
+    .command('agree [userA] [userB] [secret] [value]', 'Calculate the agreement witness', (yargs) => {
         return yargs
-            .positional('a', {
+            .positional('userA', {
                 describe: 'User A',
                 type: 'string'
             })
-            .positional('b', {
+            .positional('userB', {
                 describe: 'User B',
                 type: 'string'
+            })
+            .positional('value', {
+                describe: 'the agreed secret between A and B',
+                type: 'string',
+                default: '0.1'
+            })
+            .positional('secret', {
+                describe: 'the agreed secret between A and B',
+                type: 'string'
             });
-    }, (argv) => generateAgreementWitness(argv.a, argv.b))
+    }, (argv) => generateAgreementWitness(argv.userA, argv.userB, argv.value, argv.secret))
     .command('evaluate [in] [evaluator] [result]', 'Evaluate the agreed commitment', (yargs) => {
         return yargs
             .positional('in', {
@@ -32,7 +41,7 @@ const argv = yargs(hideBin(process.argv))
                 default: utils.generateRandomBitString(256),
             })
             .positional('result', {
-                describe: 'the commitment of the agreed statement',
+                describe: 'the commitment of the agreed statement, 1 means true, 0 means false',
                 type: 'number',
                 default: 1
             });

@@ -15,12 +15,13 @@ const zkAgreementABI = zkAgreementJSON.abi;
 const zkAgreementInterface = new ethers.Interface(zkAgreementABI)
 
 
-const calculateWitness = async () => {
+const calculateWitness = async (userA, userB, value, secret) => {
     try {
         const input = {
-            secret: utils.generateRandomBitString(256),
-            nullifier: utils.generateRandomBitString(256),
+            secret: secret.split(''),
+            nullifier: utils.generateRandomBitString(256).split(''),
         }
+
         const secretBinary = input.secret.join('');
         const secretString = BigInt('0b' + secretBinary).toString();
         const nullifierBinary = input.nullifier.join('');
@@ -35,11 +36,11 @@ const calculateWitness = async () => {
         const commitment = witnessResult[1];
         const nullifierHash = witnessResult[2];
 
-        const value = ethers.parseEther("0.001");
+        const valueEther = ethers.parseEther(value);
         const unsignedTx = {
             to: zkAgreementAddress,
             from: senderAddress,
-            value: value,
+            value: valueEther,
             data: zkAgreementInterface.encodeFunctionData("agreement", [commitment])
         };
         console.log(unsignedTx)
@@ -53,7 +54,6 @@ const calculateWitness = async () => {
         const log = txReceipt.logs[0];
 
         const decodedData = zkAgreementInterface.decodeEventLog("Agreement", log.data, log.topics);
-        console.log(decodedData.hashDirections)
 
         const proofElements = {
             merkleRoot: BigInt(decodedData.root).toString(),
@@ -68,7 +68,6 @@ const calculateWitness = async () => {
 
         console.log(proofElements);
         proofB64 = btoa(JSON.stringify(proofElements));
-        console.log(proofB64);
         fs2.writeFileSync(proofPath, proofB64);
 
     } catch (e) {
