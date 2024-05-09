@@ -47,12 +47,12 @@ const evaluateAgreement = async (proofPath, evaluator, result) => {
 
         const { proof, publicSignals } = await snarkJS.groth16.fullProve(proofInput, evaluatorWasmPath, zkeyPath)
 
-        console.log(publicSignals)
         const callInputs = [
             proof.pi_a.slice(0, 2).map(utils.BN256ToHex),
             proof.pi_b.slice(0, 2).map((row) => (utils.reverseCoordinate(row.map(utils.BN256ToHex)))),
             proof.pi_c.slice(0, 2).map(utils.BN256ToHex),
-            publicSignals.slice(0, 5).map(utils.BN256ToHex)
+            publicSignals.slice(0, 5).map(utils.BN256ToHex),
+            proofElements.commitmentValue
         ];
         console.log(callInputs)
 

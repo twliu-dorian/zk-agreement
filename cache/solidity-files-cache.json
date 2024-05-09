@@ -72,8 +72,8 @@
       ]
     },
     "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/zkAgreement.sol": {
-      "lastModificationDate": 1714938915550,
-      "contentHash": "59a89ae62d04d945f423ed675587722b",
+      "lastModificationDate": 1715221235419,
+      "contentHash": "5a3ade0977a8d34c16d5de80afcf55fb",
       "sourceName": "contracts/zkAgreement.sol",
       "solcConfig": {
         "version": "0.8.17",

@@ -63,6 +63,7 @@ const calculateWitness = async (userA, userB, value, secret) => {
             commitment: commitment.toString(),
             hashPairings: decodedData.hashPairings.map((n) => BigInt(n).toString()),
             hashDirections: decodedData.pairDirection.toString(),
+            commitmentValue: decodedData.commitmentValue.toString(),
             txHash: tx.hash,
         };
 

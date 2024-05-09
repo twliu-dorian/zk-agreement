@@ -24,7 +24,6 @@ contract zkAgreement is ReentrancyGuard {
     mapping(uint8 => uint256) lastLevelHash;
     mapping(uint => bool) public nullifierHashes;
     mapping(uint256 => bool) public commitments;
-    mapping(uint256 => uint256) public commitmentValue;
 
     uint256[10] levelDefaults = [
         63771806957809309726317474227089898627135440676260389143578078221402337729597,
@@ -42,13 +41,14 @@ contract zkAgreement is ReentrancyGuard {
     event Agreement(
         uint256 root,
         uint256[10] hashPairings,
-        uint8[10] pairDirection
+        uint8[10] pairDirection,
+        uint256 commitmentValue
     );
     event Evaluate(
         address evaluator,
         uint256 nullifierHash,
-        address recipient,
         address sender,
+        address recipient,
         uint256 result
     );
 
@@ -65,7 +65,6 @@ contract zkAgreement is ReentrancyGuard {
         uint8[10] memory hashDirections;
         uint256 currentIdx = nextLeafIdx;
         uint256 currentHash = _commitment;
-        commitmentValue[commitments] = msg.value;
 
         uint256 left;
         uint256 right;
@@ -99,19 +98,20 @@ contract zkAgreement is ReentrancyGuard {
         nextLeafIdx += 1;
 
         commitments[_commitment] = true;
-        emit Agreement(newRoot, hashPairings, hashDirections);
+        emit Agreement(newRoot, hashPairings, hashDirections, msg.value);
     }
 
     function evaluate(
         uint[2] calldata _pA,
         uint[2][2] calldata _pB,
         uint[2] calldata _pC,
-        uint[5] calldata _pubSignals
+        uint[5] calldata _pubSignals,
+        uint256 commitmentValue
     ) external payable nonReentrant {
         uint _root = _pubSignals[0];
         uint _nullifierHash = _pubSignals[1];
-        uint _recipient = _pubSignals[2];
-        uint _sender = _pubSignals[3];
+        uint _sender = _pubSignals[2];
+        uint _recipient = _pubSignals[3];
         uint _result = _pubSignals[4];
 
         require(!nullifierHashes[_nullifierHash], "already-spent");
@@ -140,10 +140,10 @@ contract zkAgreement is ReentrancyGuard {
         address senderAddr = uintToAddress(_sender);
 
         if (_result == 1) {
-            (bool success, ) = recipientAddr.call{value: commitmentValue[]}("");
+            (bool success, ) = recipientAddr.call{value: commitmentValue}("");
             require(success, "Failed to send Ether to recipient");
         } else if (_result == 0) {
-            (bool success, ) = senderAddr.call{value: denomination}("");
+            (bool success, ) = senderAddr.call{value: commitmentValue}("");
             require(success, "Failed to send Ether to sender");
         } else {
             revert("Invalid result value");
