@@ -23,24 +23,14 @@ template Evaluator(){
     signal input recipient; // user B
     signal input result; // result from mpc circuit
 
-    // signal input secret[256];
     signal input evaluator[256];
-    // signal input nullifier[256];
     signal input hashPairings[10];
     signal input hashDirections[10];
-
-    // check if the public variable (submitted) nullifierHash is equal to the output 
-    // component agreement = CommitmentGenerator();
-    // agreement.secret <== secret;
-    // agreement.nullifier <== nullifier;
-    // agreement.nullifierHash === nullifierHash;
-
 
     // checking merkle tree hash path
     component leafHashers[10];
 
     signal currentHash[10 + 1];
-    // currentHash[0] <== agreement.commitment;
     currentHash[0] <== commitment;
 
     signal left[10];

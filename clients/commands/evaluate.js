@@ -46,6 +46,10 @@ const evaluateAgreement = async (proofPath, evaluator, result) => {
 
 
         const { proof, publicSignals } = await snarkJS.groth16.fullProve(proofInput, evaluatorWasmPath, zkeyPath)
+        console.log(proof, publicSignals)
+        generateProofJSON(proof);
+        generatePublicJSON(publicSignals)
+
 
         const callInputs = [
             proof.pi_a.slice(0, 2).map(utils.BN256ToHex),
@@ -74,6 +78,28 @@ const evaluateAgreement = async (proofPath, evaluator, result) => {
         process.exit(0);
     }
 
+}
+
+function generateProofJSON(input) {
+    const jsonString = JSON.stringify(input, null, 2); // Converts the input object to a JSON string with pretty-printing
+    fs.writeFile('proof.json', jsonString, (err) => {
+        if (err) {
+            console.error('Error writing file:', err);
+        } else {
+            console.log('Successfully wrote proof to proof.json');
+        }
+    });
+}
+
+function generatePublicJSON(inputArray) {
+    const jsonString = JSON.stringify(inputArray, null, 2); // Converts the input array to a JSON string with pretty-printing
+    fs.writeFile('public.json', jsonString, (err) => {
+        if (err) {
+            console.error('Error writing file:', err);
+        } else {
+            console.log('Successfully wrote data to public.json');
+        }
+    });
 }
 
 module.exports = {

@@ -17,7 +17,7 @@ snarkjs groth16 fullprove evaluator_js/input.json evaluator_js/evaluator.wasm se
 snarkjs groth16 verify verification_key.json public.json proof.json
 snarkjs zkey export soliditycalldata public.json proof.json
 
-snarkjs zkey export solidityverifier setup_final.zkey contracts/Verifier.sol
+snarkjs zkey export solidityverifier setup_final.zkey Verifier.sol
 
 ## some randon numbers
 104443005600468911244242568449370725967937207457628891404303681777082362571812

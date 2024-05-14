@@ -12,3 +12,4 @@ proof.json
 public.json
 verification_key.json
 circuit.sh
+calldata*

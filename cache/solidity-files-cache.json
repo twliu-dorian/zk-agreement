@@ -72,8 +72,8 @@
       ]
     },
     "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/zkAgreement.sol": {
-      "lastModificationDate": 1715221235419,
-      "contentHash": "5a3ade0977a8d34c16d5de80afcf55fb",
+      "lastModificationDate": 1715654727503,
+      "contentHash": "ee798b57d921f2ea61f8233b52e480db",
       "sourceName": "contracts/zkAgreement.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -110,10 +110,10 @@
         "zkAgreement"
       ]
     },
-    "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/verifier.sol": {
-      "lastModificationDate": 1715019145553,
-      "contentHash": "793e82c9df720288ae87922e378bb3de",
-      "sourceName": "contracts/verifier.sol",
+    "/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/contracts/Verifier.sol": {
+      "lastModificationDate": 1715653915074,
+      "contentHash": "dfa026ed2403faacea6c2a8d0389167a",
+      "sourceName": "contracts/Verifier.sol",
       "solcConfig": {
         "version": "0.8.17",
         "settings": {

@@ -133,9 +133,6 @@ contract zkAgreement is ReentrancyGuard {
 
         nullifierHashes[_nullifierHash] = true;
 
-        // (bool ok, ) = target.call{value: denomination}("");
-        // require(ok, "payment-failed");
-
         address recipientAddr = uintToAddress(_recipient);
         address senderAddr = uintToAddress(_sender);
 
@@ -148,6 +145,15 @@ contract zkAgreement is ReentrancyGuard {
         } else {
             revert("Invalid result value");
         }
+        // if (_result == 1) {
+        //     (bool success, ) = recipientAddr.call{value: denomination}("");
+        //     require(success, "Failed to send Ether to recipient");
+        // } else if (_result == 0) {
+        //     (bool success, ) = senderAddr.call{value: denomination}("");
+        //     require(success, "Failed to send Ether to sender");
+        // } else {
+        //     revert("Invalid result value");
+        // }
 
         emit Evaluate(
             msg.sender,
