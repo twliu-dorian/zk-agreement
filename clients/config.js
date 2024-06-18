@@ -11,6 +11,8 @@ module.exports = {
     agreementWasmPath: process.env.AGREEMENT_WASM_PATH,
     proofPath: process.env.PROOF_PATH,
     apiUrlKey: process.env.API_URL_KEY,
-    zkeyPath: process.env.ZKEY_PATH
+    provingSystem: process.env.PROVING_SYSTEM,
+    groth16ZkeyPath: process.env.GROTH16_ZKEY_PATH,
+    plonkZkeyPath: process.env.PLONK_ZKEY_PATH
 };
 

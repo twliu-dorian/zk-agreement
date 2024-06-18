@@ -55,8 +55,8 @@ template Evaluator(){
     root === currentHash[10];
 
     // constraining signals
-    signal recipientConstraint <==  recipient * recipient;
     signal senderConstraint <== sender * sender;
+    signal recipientConstraint <==  recipient * recipient;
     signal resultConstraint <== result * result;
     
     signal evaluatorConstraint[256];
@@ -65,4 +65,4 @@ template Evaluator(){
     }
 }
 
-component main {public [root, nullifierHash, recipient, sender, result]} = Evaluator();
+component main {public [root, nullifierHash, sender, recipient, result]} = Evaluator();

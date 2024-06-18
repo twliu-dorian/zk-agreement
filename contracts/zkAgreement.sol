@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "./MiMC5Sponge.sol";
 import "./ReentrancyGuard.sol";
 
-interface IEvaluator {
+interface IGroth16Verifier {
     function verifyProof(
         uint[2] calldata _pA,
         uint[2][2] calldata _pB,
@@ -13,9 +13,18 @@ interface IEvaluator {
     ) external;
 }
 
+interface IPlonkVerifier {
+    function verifyProof(
+        uint256[24] calldata _proof,
+        uint256[5] calldata _pubSignals
+    ) external;
+}
+
 contract zkAgreement is ReentrancyGuard {
     Hasher hasher;
-    address evaluator;
+    address groth16Verifier;
+    address plonkVerifier;
+
     uint public treeLevel = 10;
     uint256 public denomination = 0.1 ether;
     uint public nextLeafIdx = 0;
@@ -52,9 +61,14 @@ contract zkAgreement is ReentrancyGuard {
         uint256 result
     );
 
-    constructor(address _hasher, address _evaluator) {
+    constructor(
+        address _hasher,
+        address _groth16Verifier,
+        address _plonkVerifier
+    ) {
         hasher = Hasher(_hasher);
-        evaluator = _evaluator;
+        groth16Verifier = _groth16Verifier;
+        plonkVerifier = _plonkVerifier;
     }
 
     function agreement(uint256 _commitment) external payable nonReentrant {
@@ -101,7 +115,7 @@ contract zkAgreement is ReentrancyGuard {
         emit Agreement(newRoot, hashPairings, hashDirections, msg.value);
     }
 
-    function evaluate(
+    function evaluateGroth16(
         uint[2] calldata _pA,
         uint[2][2] calldata _pB,
         uint[2] calldata _pC,
@@ -117,14 +131,14 @@ contract zkAgreement is ReentrancyGuard {
         require(!nullifierHashes[_nullifierHash], "already-spent");
         require(roots[_root], "non-root");
 
-        (bool verifyOK, ) = evaluator.call(
+        (bool verifyOK, ) = groth16Verifier.call(
             abi.encodeCall(
-                IEvaluator.verifyProof,
+                IGroth16Verifier.verifyProof,
                 (
                     _pA,
                     _pB,
                     _pC,
-                    [_root, _nullifierHash, _recipient, _sender, _result]
+                    [_root, _nullifierHash, _sender, _recipient, _result]
                 )
             )
         );
@@ -154,6 +168,53 @@ contract zkAgreement is ReentrancyGuard {
         // } else {
         //     revert("Invalid result value");
         // }
+
+        emit Evaluate(
+            msg.sender,
+            _nullifierHash,
+            recipientAddr,
+            senderAddr,
+            _result
+        );
+    }
+
+    function evaluatePlonk(
+        uint256[24] calldata _proof,
+        uint256[5] calldata _pubSignals,
+        uint256 commitmentValue
+    ) external payable nonReentrant {
+        uint _root = _pubSignals[0];
+        uint _nullifierHash = _pubSignals[1];
+        uint _sender = _pubSignals[2];
+        uint _recipient = _pubSignals[3];
+        uint _result = _pubSignals[4];
+
+        require(!nullifierHashes[_nullifierHash], "already-spent");
+        require(roots[_root], "non-root");
+
+        (bool verifyOK, ) = plonkVerifier.call(
+            abi.encodeCall(
+                IPlonkVerifier.verifyProof,
+                (_proof, [_root, _nullifierHash, _sender, _recipient, _result])
+            )
+        );
+
+        require(verifyOK, "invalid zero knowledge proof");
+
+        nullifierHashes[_nullifierHash] = true;
+
+        address recipientAddr = uintToAddress(_recipient);
+        address senderAddr = uintToAddress(_sender);
+
+        if (_result == 1) {
+            (bool success, ) = recipientAddr.call{value: commitmentValue}("");
+            require(success, "Failed to send Ether to recipient");
+        } else if (_result == 0) {
+            (bool success, ) = senderAddr.call{value: commitmentValue}("");
+            require(success, "Failed to send Ether to sender");
+        } else {
+            revert("Invalid result value");
+        }
 
         emit Evaluate(
             msg.sender,

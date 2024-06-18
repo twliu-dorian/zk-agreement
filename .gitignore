@@ -13,3 +13,5 @@ public.json
 verification_key.json
 circuit.sh
 calldata*
+groth16
+plonk

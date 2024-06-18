@@ -1,6 +1,6 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "IEvaluator",
+  "contractName": "IGroth16Verifier",
   "sourceName": "contracts/zkAgreement.sol",
   "abi": [
     {

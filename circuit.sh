@@ -1,6 +1,7 @@
 #!/bin/bash
 
-circom circuits/evaluator.circom --r1cs --wasm
+# cd into groth16 or plonk folder
+circom ../circuits/evaluator.circom -o ../ --r1cs --wasm
 snarkjs powersoftau new bn128 12 ceremony_0000.ptua
 snarkjs powersoftau contribute ceremony_0000.ptua ceremony_0001.ptau
 snarkjs powersoftau contribute ceremony_0001.ptua ceremony_0002.ptau
@@ -8,16 +9,29 @@ snarkjs powersoftau contribute ceremony_0002.ptua ceremony_0003.ptua
 
 snarkjs powersoftau prepare phase2 ceremony_0003.ptua ceremony_final.ptua
 snarkjs powersoftau verify ceremony_final.ptua
-snarkjs groth16 setup evaluator.r1cs ceremony_final.ptua setup_0000.zkey
+
+# Groth16
+snarkjs groth16 setup ../evaluator.r1cs ceremony_final.ptua setup_0000.zkey
 snarkjs zkey contribute setup_0000.zkey setup_final.zkey
-snarkjs zkey verify evaluator.r1cs ceremony_final.ptua setup_final.zkey
+snarkjs zkey verify ../evaluator.r1cs ceremony_final.ptua setup_final.zkey
 
 snarkjs zkey export verificationkey setup_final.zkey verification_key.json
-snarkjs groth16 fullprove evaluator_js/input.json evaluator_js/evaluator.wasm setup_final.zkey proof.json public.json
+snarkjs groth16 fullprove ../evaluator_js/input.json ../evaluator_js/evaluator.wasm setup_final.zkey proof.json public.json
 snarkjs groth16 verify verification_key.json public.json proof.json
 snarkjs zkey export soliditycalldata public.json proof.json
 
-snarkjs zkey export solidityverifier setup_final.zkey Verifier.sol
+snarkjs zkey export solidityverifier setup_final.zkey Groth16Verifier.sol
+
+# Plonk
+snarkjs plonk setup evaluator.r1cs ceremony_final.ptua setup_final.zkey
+# snarkjs zkey verify evaluator.r1cs ceremony_final.ptua setup_final.zkey
+
+snarkjs zkey export verificationkey setup_final.zkey verification_key.json
+snarkjs plonk fullprove ../evaluator_js/input.json ../evaluator_js/evaluator.wasm setup_final.zkey proof.json public.json
+snarkjs plonk verify verification_key.json public.json proof.json
+snarkjs zkey export soliditycalldata public.json proof.json
+
+snarkjs zkey export solidityverifier setup_final.zkey PlonkVerifier.sol
 
 ## some randon numbers
 104443005600468911244242568449370725967937207457628891404303681777082362571812
