@@ -1,0 +1,7 @@
+4:28:47 PM - [32minfo[39m: Loading a default sample.txt file.
+4:28:47 PM - [31merror[39m: A sample.txt file is required. Try the --sample flag or create a sample.txt in the root folder of your template.
+4:29:06 PM - [31merror[39m: ENOENT: no such file or directory, lstat '/Users/dorian/Desktop/M. Green Masters Research/zk-agreement/legal_contracts/sample.txt'
+4:29:11 PM - [31merror[39m: A sample.txt file is required. Try the --sample flag or create a sample.txt in the root folder of your template.
+11:17:38 AM - [32minfo[39m: Using current directory as template folder
+11:17:38 AM - [32minfo[39m: Loading a default sample.txt file.
+11:17:38 AM - [31merror[39m: A sample.txt file is required. Try the --sample flag or create a sample.txt in the root folder of your template.
