@@ -1,0 +1,30 @@
+{
+    "$class": "org.accordproject.supplyagreement.AgreementState",
+    "purchaseObligation": {
+        "$class": "org.accordproject.supplyagreement.PurchaseObligation",
+        "requiredPurchase": 1020.0,
+        "year": 2019,
+        "quarter": 1,
+        "party": "PETER"
+    },
+    "deliveryObligation": {
+        "$class": "org.accordproject.supplyagreement.DeliveryObligation",
+        "expectedDelivery": "2018-05-09T20:00:00.000-04:00",
+        "deliverables": [
+            {
+                "$class": "org.accordproject.purchaseorder.OrderItem",
+                "partNumber": "Pink Umbrella",
+                "quantity": 180,
+                "$identifier": "Pink Umbrella"
+            },
+            {
+                "$class": "org.accordproject.purchaseorder.OrderItem",
+                "partNumber": "Blue Umbrella",
+                "quantity": 100,
+                "$identifier": "Blue Umbrella"
+            }
+        ],
+        "party": "DAN"
+    },
+    "paymentObligation": null
+}

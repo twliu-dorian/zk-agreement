@@ -3,25 +3,13 @@ pragma circom  2.0.0;
 include "./utils/mimc5sponge.circom";
 include "./agreement.circom";
 
-/**
-private input
-    result
-    y: measured truth
-public input
-    merkleRoot
-    merklePath
-    nullifierHash
-    sender 
-    recipient
-*/
-
 template Evaluator(){
     signal input root;
     signal input nullifierHash;
     signal input commitment;
     signal input sender; // user A
     signal input recipient; // user B
-    signal input result; // result from mpc circuit
+    signal input ratio; // ratio computed from mpc circuit
 
     signal input evaluator[256];
     signal input hashPairings[10];
@@ -57,7 +45,8 @@ template Evaluator(){
     // constraining signals
     signal senderConstraint <== sender * sender;
     signal recipientConstraint <==  recipient * recipient;
-    signal resultConstraint <== result * result;
+    signal resultConstraint <== ratio * ratio;
+    signal valueConstraint <== value * value;
     
     signal evaluatorConstraint[256];
     for (var i = 0; i < 256; i++) {
@@ -65,4 +54,4 @@ template Evaluator(){
     }
 }
 
-component main {public [root, nullifierHash, sender, recipient, result]} = Evaluator();
+component main {public [root, nullifierHash, sender, recipient, ratio, value]} = Evaluator();

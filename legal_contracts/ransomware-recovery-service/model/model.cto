@@ -1,0 +1,34 @@
+namespace org.accordproject.ransomwarerecovery
+
+import org.accordproject.contract.* from https://models.accordproject.org/accordproject/contract.cto
+import org.accordproject.runtime.* from https://models.accordproject.org/accordproject/runtime.cto
+
+asset RansomwareRecoveryAgreement extends Agreement {
+  o String anonymousVictim
+  o DateTime startDate
+}
+
+asset RansomwareRecoveryState extends State {
+  o String status
+  o Boolean decryptionComplete
+  o String decryptor optional
+}
+
+transaction DecryptionCompleteRequest extends Request {
+  o String decryptorAddress
+  o String decryptionProof
+}
+
+transaction DecryptionCompleteResponse extends Response {
+  o String message
+}
+
+transaction VerifyDecryptionRequest extends Request {
+  o Boolean isDecryptionValid
+}
+
+transaction VerifyDecryptionResponse extends Response {
+  o String message
+  o String decryptorAddress
+  o Double ethAmount
+}

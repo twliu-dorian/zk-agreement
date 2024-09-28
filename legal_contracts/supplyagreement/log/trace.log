@@ -1,0 +1,3 @@
+9:03:43 PM - [32minfo[39m: Using current directory as template folder
+9:03:43 PM - [32minfo[39m: Loading a default sample.txt file.
+9:03:43 PM - [31merror[39m: A sample.txt file is required. Try the --sample flag or create a sample.txt in the root folder of your template.

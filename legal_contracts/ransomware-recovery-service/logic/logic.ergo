@@ -1,0 +1,52 @@
+namespace org.accordproject.ransomwarerecovery
+
+import org.accordproject.time.*
+
+contract RansomwareRecovery over RansomwareRecoveryAgreement {
+  // Initialize the contract state
+  clause init(request : Request) : Response {
+    set state RansomwareRecoveryState {
+      status: "AWAITING_DECRYPTION",
+      decryptionComplete: false,
+      decryptor: none
+    };
+    return Response{}
+  }
+
+  // Clause to mark decryption as complete
+  clause markDecryptionComplete(request : DecryptionCompleteRequest) : DecryptionCompleteResponse {
+    enforce (state.status = "AWAITING_DECRYPTION") 
+      else throw Error{ message: "Decryption has already been completed" };
+    
+    set state RansomwareRecoveryState {
+      status: "DECRYPTION_PENDING_VERIFICATION",
+      decryptionComplete: false,
+      decryptor: some(request.decryptorAddress)
+    };
+    
+    return DecryptionCompleteResponse{
+      message: "Decryption marked as complete. Awaiting verification from the victim."
+    }
+  }
+
+  // Clause to verify decryption and release payment
+  clause verifyDecryption(request : VerifyDecryptionRequest) : VerifyDecryptionResponse {
+    enforce (state.status = "DECRYPTION_PENDING_VERIFICATION") 
+      else throw Error{ message: "No decryption is pending verification" };
+    
+    enforce (request.isDecryptionValid) 
+      else throw Error{ message: "Decryption was reported as invalid" };
+    
+    set state RansomwareRecoveryState {
+      status: "DECRYPTION_VERIFIED",
+      decryptionComplete: true,
+      decryptor: state.decryptor
+    };
+    
+    return VerifyDecryptionResponse{
+      message: "Decryption verified. Smart contract should release 1 ETH to the decryptor.",
+      decryptorAddress: state.decryptor.orElse("N/A"),
+      ethAmount: 1.0
+    }
+  }
+}

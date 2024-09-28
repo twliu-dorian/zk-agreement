@@ -3,8 +3,8 @@ pragma circom  2.0.0;
 include "../node_modules/circomlib/circuits/pedersen.circom";
 
 template CommitmentGenerator () {   
-    signal input nullifier[256];
-    signal input secret[256];
+    signal input nullifier[256]; 
+    signal input secret[256]; 
     signal output commitment;
     signal output nullifierHash;
 

@@ -1,8 +1,9 @@
 node_modules
-.env
-.DS_Store
 agreement_js
 evaluator_js
+.env
+.DS_Store
+secret.md
 notes
 ceremony*
 setup*
@@ -15,3 +16,6 @@ circuit.sh
 calldata*
 groth16
 plonk
+artifacts
+cache
+circuit.md
