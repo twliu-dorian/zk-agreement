@@ -1,12 +1,12 @@
-const { senderAddress, senderPrivateKey, agreementWasmPath, apiUrlKey, zkAgreementAddress, proofPath } = require("../config.js")
-const wc = require("../../agreement_js/witness_calculator.js")
+const { buyerAddress, buyerPrivateKey, recordWasmPath, apiUrlKey, zkAgreementAddress, proofPath } = require("../config.js")
+const wc = require("../../record_js/witness_calculator.js")
 const { ethers, JsonRpcProvider } = require("ethers")
 const { utils } = require("../utils/util.js")
 const fs = require('fs').promises;
 const fs2 = require('fs');
 const path = require('path');
 
-const signerWallet = new ethers.Wallet(senderPrivateKey);
+const signerWallet = new ethers.Wallet(buyerPrivateKey);
 const provider = new JsonRpcProvider(apiUrlKey);
 const signer = signerWallet.connect(provider);
 
@@ -15,32 +15,32 @@ const zkAgreementABI = zkAgreementJSON.abi;
 const zkAgreementInterface = new ethers.Interface(zkAgreementABI)
 
 
-const calculateWitness = async (userA, userB, value, secret) => {
+const calculateCommitment = async (buyer, seller, value, record) => {
     try {
         const input = {
-            secret: secret.split(''),
+            record: record.split(''),
             nullifier: utils.generateRandomBitString(256).split(''),
         }
 
-        const secretBinary = input.secret.join('');
+        const secretBinary = input.record.join('');
         const secretString = BigInt('0b' + secretBinary).toString();
         const nullifierBinary = input.nullifier.join('');
         const nullifierString = BigInt('0b' + nullifierBinary).toString();
 
-        const absolutePath = path.resolve(agreementWasmPath);
+        const absolutePath = path.resolve(recordWasmPath);
         const wasmBuffer = await fs.readFile(absolutePath);
-        var agreement = await wc(wasmBuffer);
+        var record = await wc(wasmBuffer);
 
-        const witnessResult = await agreement.calculateWitness(input, 0);
+        const witnessResult = await record.calculateWitness(input, 0);
 
         const commitment = witnessResult[1];
         const nullifierHash = witnessResult[2];
 
-        const valueEther = ethers.parseEther(value);
+        const valueWei = ethers.parseEther(value);
         const unsignedTx = {
             to: zkAgreementAddress,
-            from: senderAddress,
-            value: valueEther,
+            from: buyerAddress,
+            value: valueWei,
             data: zkAgreementInterface.encodeFunctionData("agreement", [commitment])
         };
         console.log(unsignedTx)
@@ -58,16 +58,16 @@ const calculateWitness = async (userA, userB, value, secret) => {
         const proofElements = {
             merkleRoot: BigInt(decodedData.root).toString(),
             nullifierHash: nullifierHash.toString(),
-            secret: secretString,
+            record: secretString,
             nullifier: nullifierString,
             commitment: commitment.toString(),
             hashPairings: decodedData.hashPairings.map((n) => BigInt(n).toString()),
             hashDirections: decodedData.pairDirection.toString(),
-            commitmentValue: decodedData.commitmentValue.toString(),
-            txHash: tx.hash,
+            commitmentValue: ethers.formatUnits(decodedData.commitmentValue, "ether").toString(),
+            txHash: tx.hash
         };
 
-        console.log(proofElements);
+        console.log("proof elements:", proofElements);
         proofB64 = btoa(JSON.stringify(proofElements));
         fs2.writeFileSync(proofPath, proofB64);
 
@@ -79,5 +79,5 @@ const calculateWitness = async (userA, userB, value, secret) => {
 
 
 module.exports = {
-    calculateWitness
+    calculateCommitment
 };

@@ -2,18 +2,18 @@
 
 # cd into groth16 or plonk folder
 circom ../circuits/evaluator.circom -o ../ --r1cs --wasm
-snarkjs powersoftau new bn128 12 ceremony_0000.ptua
-snarkjs powersoftau contribute ceremony_0000.ptua ceremony_0001.ptau
-snarkjs powersoftau contribute ceremony_0001.ptua ceremony_0002.ptau
-snarkjs powersoftau contribute ceremony_0002.ptua ceremony_0003.ptua
+snarkjs powersoftau new bn128 12 ceremony_0000.ptau
+snarkjs powersoftau contribute ceremony_0000.ptau ceremony_0001.ptau
+snarkjs powersoftau contribute ceremony_0001.ptau ceremony_0002.ptau
+snarkjs powersoftau contribute ceremony_0002.ptau ceremony_0003.ptau
 
-snarkjs powersoftau prepare phase2 ceremony_0003.ptua ceremony_final.ptua
-snarkjs powersoftau verify ceremony_final.ptua
+snarkjs powersoftau prepare phase2 ceremony_0003.ptau ceremony_final.ptau
+snarkjs powersoftau verify ceremony_final.ptau
 
-# Groth16
-snarkjs groth16 setup ../evaluator.r1cs ceremony_final.ptua setup_0000.zkey
+# Groth16 --------------------------------------------------------------------------------
+snarkjs groth16 setup ../evaluator.r1cs ceremony_final.ptau setup_0000.zkey
 snarkjs zkey contribute setup_0000.zkey setup_final.zkey
-snarkjs zkey verify ../evaluator.r1cs ceremony_final.ptua setup_final.zkey
+snarkjs zkey verify ../evaluator.r1cs ceremony_final.ptau setup_final.zkey
 
 snarkjs zkey export verificationkey setup_final.zkey verification_key.json
 snarkjs groth16 fullprove ../evaluator_js/input.json ../evaluator_js/evaluator.wasm setup_final.zkey proof.json public.json
@@ -21,13 +21,17 @@ snarkjs groth16 verify verification_key.json public.json proof.json
 snarkjs zkey export soliditycalldata public.json proof.json
 
 snarkjs zkey export solidityverifier setup_final.zkey Groth16Verifier.sol
+# Groth16 --------------------------------------------------------------------------------
 
-# Plonk
-snarkjs plonk setup evaluator.r1cs ceremony_final.ptua setup_final.zkey
-# snarkjs zkey verify evaluator.r1cs ceremony_final.ptua setup_final.zkey
+# Plonk ----------------------------------------------------------------------------------
+snarkjs plonk setup ../evaluator.r1cs ceremony_final.ptau setup_final.zkey
+
+# Plonk ----------------------------------------------------------------------------------
 
 snarkjs zkey export verificationkey setup_final.zkey verification_key.json
+
 snarkjs plonk fullprove ../evaluator_js/input.json ../evaluator_js/evaluator.wasm setup_final.zkey proof.json public.json
+
 snarkjs plonk verify verification_key.json public.json proof.json
 snarkjs zkey export soliditycalldata public.json proof.json
 

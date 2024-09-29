@@ -4,7 +4,7 @@ include "../node_modules/circomlib/circuits/pedersen.circom";
 
 template CommitmentGenerator () {   
     signal input nullifier[256]; 
-    signal input secret[256]; 
+    signal input record[256]; 
     signal output commitment;
     signal output nullifierHash;
 
@@ -13,7 +13,7 @@ template CommitmentGenerator () {
     
     for (var i = 0; i < 256; i++) {
         nullifierHasher.in[i] <== nullifier[i];
-        commitmentHasher.in[i] <== secret[i];
+        commitmentHasher.in[i] <== record[i];
         commitmentHasher.in[i + 256] <== nullifier[i];
     }
 

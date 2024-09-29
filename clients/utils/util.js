@@ -68,6 +68,12 @@ const utils = {
             return acc + bits;
         }, '');
         return bitString;
+    },
+    leftPadTo32Digits: (value) => {
+        const valueString = value.toString(); // Convert the number to a string
+        const totalLength = 32; // Desired total length
+        const paddedValue = valueString.padStart(totalLength, '0'); // Left pad with '0' until length is 32
+        return paddedValue;
     }
 };
 

@@ -38,10 +38,9 @@ const plonkEvaluator = async (proofElements, proofInput) => {
             utils.BN256ToHex(proof.eval_s1),
             utils.BN256ToHex(proof.eval_s2),
             utils.BN256ToHex(proof.eval_zw),
-
         ];
         const callInputs = [proofInputs, publicSignals.slice(0, 5).map(utils.BN256ToHex),
-            proofElements.commitmentValue]
+            String(Math.floor(parseFloat(proofElements.commitmentValue)))]
         console.log("smart contract call inputs:\n", callInputs)
 
         const unsignedTx = {

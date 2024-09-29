@@ -56,8 +56,8 @@ contract zkAgreement is ReentrancyGuard {
     event Evaluate(
         address evaluator,
         uint256 nullifierHash,
-        address sender,
-        address recipient,
+        address buyer,
+        address seller,
         uint256 result
     );
 
@@ -122,10 +122,10 @@ contract zkAgreement is ReentrancyGuard {
         uint[5] calldata _pubSignals,
         uint256 commitmentValue
     ) external payable nonReentrant {
-        uint _root = _pubSignals[0];
-        uint _nullifierHash = _pubSignals[1];
-        uint _sender = _pubSignals[2];
-        uint _recipient = _pubSignals[3];
+        uint _nullifierHash = _pubSignals[0];
+        uint _root = _pubSignals[1];
+        uint _buyer = _pubSignals[2];
+        uint _seller = _pubSignals[3];
         uint _result = _pubSignals[4];
 
         require(!nullifierHashes[_nullifierHash], "already-spent");
@@ -138,7 +138,7 @@ contract zkAgreement is ReentrancyGuard {
                     _pA,
                     _pB,
                     _pC,
-                    [_root, _nullifierHash, _sender, _recipient, _result]
+                    [_root, _nullifierHash, _buyer, _seller, _result]
                 )
             )
         );
@@ -147,33 +147,24 @@ contract zkAgreement is ReentrancyGuard {
 
         nullifierHashes[_nullifierHash] = true;
 
-        address recipientAddr = uintToAddress(_recipient);
-        address senderAddr = uintToAddress(_sender);
+        address sellerAddr = uintToAddress(_seller);
+        address buyerAddr = uintToAddress(_buyer);
 
         if (_result == 1) {
-            (bool success, ) = recipientAddr.call{value: commitmentValue}("");
-            require(success, "Failed to send Ether to recipient");
+            (bool success, ) = sellerAddr.call{value: commitmentValue}("");
+            require(success, "Failed to send Ether to seller");
         } else if (_result == 0) {
-            (bool success, ) = senderAddr.call{value: commitmentValue}("");
-            require(success, "Failed to send Ether to sender");
+            (bool success, ) = buyerAddr.call{value: commitmentValue}("");
+            require(success, "Failed to send Ether to buyer");
         } else {
             revert("Invalid result value");
         }
-        // if (_result == 1) {
-        //     (bool success, ) = recipientAddr.call{value: denomination}("");
-        //     require(success, "Failed to send Ether to recipient");
-        // } else if (_result == 0) {
-        //     (bool success, ) = senderAddr.call{value: denomination}("");
-        //     require(success, "Failed to send Ether to sender");
-        // } else {
-        //     revert("Invalid result value");
-        // }
 
         emit Evaluate(
             msg.sender,
             _nullifierHash,
-            recipientAddr,
-            senderAddr,
+            sellerAddr,
+            buyerAddr,
             _result
         );
     }
@@ -183,10 +174,10 @@ contract zkAgreement is ReentrancyGuard {
         uint256[5] calldata _pubSignals,
         uint256 commitmentValue
     ) external payable nonReentrant {
-        uint _root = _pubSignals[0];
-        uint _nullifierHash = _pubSignals[1];
-        uint _sender = _pubSignals[2];
-        uint _recipient = _pubSignals[3];
+        uint _nullifierHash = _pubSignals[0];
+        uint _root = _pubSignals[1];
+        uint _buyer = _pubSignals[2];
+        uint _seller = _pubSignals[3];
         uint _result = _pubSignals[4];
 
         require(!nullifierHashes[_nullifierHash], "already-spent");
@@ -195,7 +186,7 @@ contract zkAgreement is ReentrancyGuard {
         (bool verifyOK, ) = plonkVerifier.call(
             abi.encodeCall(
                 IPlonkVerifier.verifyProof,
-                (_proof, [_root, _nullifierHash, _sender, _recipient, _result])
+                (_proof, [_root, _nullifierHash, _buyer, _seller, _result])
             )
         );
 
@@ -203,15 +194,15 @@ contract zkAgreement is ReentrancyGuard {
 
         nullifierHashes[_nullifierHash] = true;
 
-        address recipientAddr = uintToAddress(_recipient);
-        address senderAddr = uintToAddress(_sender);
+        address sellerAddr = uintToAddress(_seller);
+        address buyerAddr = uintToAddress(_buyer);
 
         if (_result == 1) {
-            (bool success, ) = recipientAddr.call{value: commitmentValue}("");
-            require(success, "Failed to send Ether to recipient");
+            (bool success, ) = sellerAddr.call{value: commitmentValue}("");
+            require(success, "Failed to send Ether to seller");
         } else if (_result == 0) {
-            (bool success, ) = senderAddr.call{value: commitmentValue}("");
-            require(success, "Failed to send Ether to sender");
+            (bool success, ) = buyerAddr.call{value: commitmentValue}("");
+            require(success, "Failed to send Ether to buyer");
         } else {
             revert("Invalid result value");
         }
@@ -219,8 +210,8 @@ contract zkAgreement is ReentrancyGuard {
         emit Evaluate(
             msg.sender,
             _nullifierHash,
-            recipientAddr,
-            senderAddr,
+            sellerAddr,
+            buyerAddr,
             _result
         );
     }

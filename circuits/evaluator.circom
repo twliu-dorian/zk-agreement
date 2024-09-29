@@ -1,19 +1,25 @@
 pragma circom  2.0.0;
 
 include "./utils/mimc5sponge.circom";
-include "./agreement.circom";
+include "./commitment_generator.circom";
 
 template Evaluator(){
-    signal input root;
     signal input nullifierHash;
     signal input commitment;
-    signal input sender; // user A
-    signal input recipient; // user B
-    signal input ratio; // ratio computed from mpc circuit
-
-    signal input evaluator[256];
+    
+    // Merkle proofs
+    signal input root;
     signal input hashPairings[10];
     signal input hashDirections[10];
+    
+    // public inputs
+    signal input buyer; // party A
+    signal input seller; // party B
+    signal input ratio; // ratio computed from mpc circuit
+    // signal input value; 
+    signal input evaluator[256];
+    
+   
 
     // checking merkle tree hash path
     component leafHashers[10];
@@ -43,10 +49,10 @@ template Evaluator(){
     root === currentHash[10];
 
     // constraining signals
-    signal senderConstraint <== sender * sender;
-    signal recipientConstraint <==  recipient * recipient;
-    signal resultConstraint <== ratio * ratio;
-    signal valueConstraint <== value * value;
+    signal buyerConstraint <== buyer * buyer;
+    signal sellerConstraint <==  seller * seller;
+    signal ratioConstraint <== ratio * ratio;
+    // signal valueConstraint <== value * value;
     
     signal evaluatorConstraint[256];
     for (var i = 0; i < 256; i++) {
@@ -54,4 +60,4 @@ template Evaluator(){
     }
 }
 
-component main {public [root, nullifierHash, sender, recipient, ratio, value]} = Evaluator();
+component main {public [root, nullifierHash, buyer, seller, ratio]} = Evaluator();
